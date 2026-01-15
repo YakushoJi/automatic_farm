@@ -1,12 +1,15 @@
 # 🌱 ESP32 Smart Farm IoT System
-> **Monitor NPK, Soil Moisture, and Auto-Watering with Telegram Alerts**
+> **An all-in-one solution for soil nutrient monitoring (NPK), moisture control, and remote alerts via Telegram.**
 
-![Language](https://img.shields.io/badge/Language-C%2B%2B-blue.svg)
 ![Platform](https://img.shields.io/badge/Platform-ESP32-orange.svg)
+![Language](https://img.shields.io/badge/Language-C%2B%2B%20%7C%20Arduino-blue.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen.svg)
 
 ## 📖 Overview
-This project is a complete **Smart Agriculture solution** powered by an **ESP32**. It allows you to monitor soil health (Nitrogen, Phosphorus, Potassium) and moisture levels in real-time. The system automatically controls a water pump based on moisture thresholds and sends detailed status reports directly to your smartphone via Telegram.
+This project transforms a standard ESP32 into a **Smart Agriculture Controller**. It reads industrial-grade **RS485 NPK sensors** and capacitive soil moisture sensors to make intelligent watering decisions.
+
+Users can view real-time data on an **OLED dashboard** or receive detailed status reports directly on their smartphone via a **Telegram Bot** every minute.
 
 ---
 
@@ -14,54 +17,66 @@ This project is a complete **Smart Agriculture solution** powered by an **ESP32*
 
 | Feature | Description |
 | :--- | :--- |
-| **🧪 NPK Monitoring** | Reads soil nutrients (N, P, K) using RS485 Modbus industrial sensors. |
-| **💧 Smart Watering** | Auto-activates pump when moisture is **< 35%** and stops at **> 60%**. |
-| **📱 Telegram Bot** | Sends a report every **60 seconds** with current sensor readings & pump status. |
-| **📟 OLED Dashboard** | Displays real-time data, WiFi status, and active components on a 0.96" screen. |
-| **🔄 Auto-Reconnect** | Built-in redundancy to reconnect to WiFi automatically if signal is lost. |
+| **🧪 Soil Nutrient Analysis** | Reads Nitrogen (N), Phosphorus (P), and Potassium (K) levels via Modbus RTU. |
+| **💧 Auto-Watering System** | Automates the water pump based on soil moisture (On < 35% / Off > 60%). |
+| **📱 Telegram Integration** | Sends periodic reports (Moisture %, Pump Status, NPK mg/kg) to your chat. |
+| **📟 OLED Display** | Local dashboard showing WiFi status, pump state, and sensor values. |
+| **🔄 Auto-Reconnect** | Robust WiFi handling system to ensure 24/7 connectivity. |
 
 ---
 
 ## 🛠️ Hardware Requirements
 
-* **Microcontroller:** ESP32 Development Board
-* **Sensors:**
-    * NPK Soil Sensor (RS485 Modbus)
-    * Capacitive Soil Moisture Sensor (Analog)
-* **Modules:**
-    * MAX485 / RS485 to TTL Adapter
-    * Relay Module (5V/12V)
-    * OLED Display 0.96" (I2C)
-* **Power:** 5V-12V Power Supply (NPK sensors typically need 12V).
+| Component | Quantity | Description |
+| :--- | :--- | :--- |
+| **ESP32 Dev Board** | 1 | The main microcontroller (30 pins or 38 pins). |
+| **NPK Sensor (RS485)** | 1 | Industrial soil sensor (Modbus protocol). |
+| **Soil Moisture Sensor** | 1 | Capacitive type (corrosion resistant). |
+| **RS485 to TTL Module** | 1 | MAX485 module for communicating with the NPK sensor. |
+| **OLED Display** | 1 | 0.96 inch I2C SSD1306 (128x64 pixels). |
+| **Relay Module** | 1 | 1-Channel Relay (5V/12V) for controlling the pump. |
+| **Power Supply** | 1 | 12V DC Adapter (required for NPK sensor & pump). |
 
 ---
 
-## 🔌 Wiring Diagram
+## 🔌 Wiring Diagram / Pinout
 
-Connect your components to the ESP32 as follows:
+Connect the components to the ESP32 as defined below:
 
 | Component | Pin Name | ESP32 GPIO | Notes |
 | :--- | :--- | :--- | :--- |
 | **OLED Display** | SDA | `21` | I2C Data |
 | | SCL | `22` | I2C Clock |
-| **RS485 Module** | RO (RX) | `26` | Serial2 RX |
-| | DI (TX) | `27` | Serial2 TX |
-| | DE | `4` | Write Enable |
-| | RE | `5` | Read Enable |
-| **Sensors** | Soil Moisture | `32` | Analog Input |
-| **Actuators** | Relay (Pump) | `15` | Digital Output |
+| | VCC | `3.3V` or `5V` | |
+| **RS485 Module** | DI (TX) | `27` | Connected to Serial2 TX |
+| | RO (RX) | `26` | Connected to Serial2 RX |
+| | DE | `4` | Write Enable Control |
+| | RE | `5` | Read Enable Control |
+| **Soil Sensor** | Analog Out | `32` | Capacitive Sensor Input |
+| **Relay** | Signal (IN) | `15` | Pump Control |
 
-> **⚠️ Important:** Ensure the Ground (GND) of the external power supply is connected to the ESP32 GND.
+> **⚠️ Important:** The NPK Sensor usually requires **5V-30V** external power. Do not power it directly from the ESP32's 3.3V pin. Ensure all Ground (GND) connections are common.
 
 ---
 
-## ⚙️ Configuration
+## ⚙️ Configuration & Setup
 
-Open `main.cpp` and update the following credentials before uploading:
+### 1. Library Installation
+Install the following libraries via Arduino IDE or PlatformIO:
+* `Adafruit GFX Library`
+* `Adafruit SSD1306`
+* `UniversalTelegramBot` (by Brian Lough)
+* `ArduinoJson`
 
-### 1. WiFi & Telegram
+### 2. Credentials Setup
+Open `main.cpp` and edit the configuration section:
+
 ```cpp
-const char* ssid     = "YOUR_WIFI_NAME";
-const char* password = "YOUR_WIFI_PASSWORD";
-const char* botToken = "YOUR_TELEGRAM_BOT_TOKEN";
-const char* chatID   = "YOUR_TELEGRAM_CHAT_ID";
+// ==========================================
+// WiFi & Telegram Settings
+// ==========================================
+const char* ssid     = "YOUR_WIFI_NAME";      // Enter your WiFi Name
+const char* password = "YOUR_WIFI_PASSWORD";  // Enter your WiFi Password
+const char* botToken = "YOUR_BOT_TOKEN";      // Get from BotFather
+const char* chatID   = "YOUR_CHAT_ID";        // Get from IDBot
+
