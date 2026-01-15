@@ -9,12 +9,12 @@
 // ==========================================
 // 1. WiFi and Telegram Setup
 // ==========================================
-const char* ssid = "NPK_FARM";           // WiFi Name
-const char* password = "NPK_FARM";       // WiFi Password
+const char* ssid = "YOUR_WIFI_NAME";           // WiFi Name
+const char* password = "YOUR_WIFI_PASSWORD";       // WiFi Password
 
 // *** Don't forget to update the Token if you create a new bot ***
-const char* botToken = "8314340056:AAEbYV78E13oTwjTq19H3PJdDqtldtOa6Nk";
-const char* chatID = "-5058470466";
+const char* botToken = "YOUR_BOT_TOKEN";
+const char* chatID = "YOUR_CHAT_ID";
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(botToken, client);
